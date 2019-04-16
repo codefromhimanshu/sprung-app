@@ -1,0 +1,18 @@
+.home-page .banner {
+	background: #4599ca;
+}
+
+.navbar-brand {
+	color: #4599ca !important;	
+}
+
+a {
+    color: #4599ca;
+    text-decoration: none;
+}
+
+.nav-pills.outline-active .nav-link.active {
+    background: #fff !important;
+    border-bottom: 2px solid #4599ca !important;
+    color: #4599ca !important;
+}

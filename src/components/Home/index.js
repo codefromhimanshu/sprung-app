@@ -21,8 +21,11 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   onClickTag: (tag, pager, payload) =>
     dispatch({ type: APPLY_TAG_FILTER, tag, pager, payload }),
-  onLoad: (tab, pager, payload) =>
-    dispatch({ type: HOME_PAGE_LOADED, tab, pager, payload }),
+  onLoad: (tab, pager, payload) => {
+    console.log(pager);
+    console.log(payload);
+    dispatch({ type: HOME_PAGE_LOADED, tab, pager, payload })
+  },
   onUnload: () =>
     dispatch({  type: HOME_PAGE_UNLOADED })
 });
@@ -34,7 +37,7 @@ class Home extends React.Component {
       agent.Articles.feed :
       agent.Articles.all;
 
-    this.props.onLoad(tab, articlesPromise, Promise.all([agent.Tags.getAll(), articlesPromise()]));
+    this.props.onLoad(tab, articlesPromise, [agent.Tags.getAll(), articlesPromise()]);
   }
 
   componentWillUnmount() {

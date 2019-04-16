@@ -8,19 +8,31 @@ import {
   LOGIN,
   LOGIN_PAGE_UNLOADED
 } from '../constants/actionTypes';
+import { bindActionCreators } from 'redux';
 
 const mapStateToProps = state => ({ ...state.auth });
 
-const mapDispatchToProps = dispatch => ({
-  onChangeEmail: value =>
-    dispatch({ type: UPDATE_FIELD_AUTH, key: 'email', value }),
-  onChangePassword: value =>
-    dispatch({ type: UPDATE_FIELD_AUTH, key: 'password', value }),
-  onSubmit: (email, password) =>
-    dispatch({ type: LOGIN, payload: agent.Auth.login(email, password) }),
-  onUnload: () =>
-    dispatch({ type: LOGIN_PAGE_UNLOADED })
-});
+const onSubmit = (email, password) => dispatch => {
+  return agent.Auth.login(email, password).then(user => {
+    dispatch({ type: LOGIN, payload: user })
+  }).catch(err => {
+    console.log(err);
+    dispatch({ type: LOGIN, error: err });
+  });
+}
+
+const onChangeEmail = value => ({ type: UPDATE_FIELD_AUTH, key: 'email', value });
+const onChangePassword = value => ({ type: UPDATE_FIELD_AUTH, key: 'password', value });
+const onUnload = () => ({ type: LOGIN_PAGE_UNLOADED });
+
+const mapDispatchToProps = dispatch => {
+  return bindActionCreators({
+    onChangeEmail,
+    onChangePassword,
+    onSubmit,
+    onUnload,
+  }, dispatch);
+}
 
 class Login extends React.Component {
   constructor() {
@@ -53,7 +65,7 @@ class Login extends React.Component {
                 </Link>
               </p>
 
-              <ListErrors errors={this.props.errors} />
+              <ListErrors error={this.props.error} />
 
               <form onSubmit={this.submitForm(email, password)}>
                 <fieldset>

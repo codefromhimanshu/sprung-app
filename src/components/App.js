@@ -16,11 +16,16 @@ import { store } from '../store';
 import { push } from 'react-router-redux';
 
 const mapStateToProps = state => {
+  const authUser = JSON.parse(window.localStorage.getItem('authUser'));
+  let currentUser;
+  if(authUser){
+    currentUser = authUser;
+  }
   return {
+    currentUser,
     appLoaded: state.common.appLoaded,
     appName: state.common.appName,
-    currentUser: state.common.currentUser,
-    redirectTo: state.common.redirectTo
+    redirectTo: state.common.redirectTo,
   }};
 
 const mapDispatchToProps = dispatch => ({

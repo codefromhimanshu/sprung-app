@@ -3,6 +3,7 @@ import ListErrors from './ListErrors';
 import React from 'react';
 import agent from '../agent';
 import { connect } from 'react-redux';
+import {bindActionCreators} from "redux";
 import {
   UPDATE_FIELD_AUTH,
   REGISTER,
@@ -11,30 +12,40 @@ import {
 
 const mapStateToProps = state => ({ ...state.auth });
 
-const mapDispatchToProps = dispatch => ({
-  onChangeEmail: value =>
-    dispatch({ type: UPDATE_FIELD_AUTH, key: 'email', value }),
-  onChangePassword: value =>
-    dispatch({ type: UPDATE_FIELD_AUTH, key: 'password', value }),
-  onChangeUsername: value =>
-    dispatch({ type: UPDATE_FIELD_AUTH, key: 'username', value }),
-  onSubmit: (username, email, password) => {
-    const payload = agent.Auth.register(username, email, password);
-    dispatch({ type: REGISTER, payload })
-  },
-  onUnload: () =>
-    dispatch({ type: REGISTER_PAGE_UNLOADED })
-});
+const onSubmit = (email, password) => dispatch => {
+  return agent.Auth.register(email, password).then(user => {
+    dispatch({ type: REGISTER, payload: user });
+  }).catch(err => {
+    console.log(err);
+    dispatch({ type: REGISTER, error: err })
+  });
+};
+
+const onChangeEmail = value => ({ type: UPDATE_FIELD_AUTH, key: 'email', value });
+const onChangePassword = value => ({ type: UPDATE_FIELD_AUTH, key: 'password', value });
+// const onChangeUsername = value => ({ type: UPDATE_FIELD_AUTH, key: 'username', value });
+const onUnload = () => ({ type: REGISTER_PAGE_UNLOADED });
+
+
+const mapDispatchToProps = dispatch => {
+  return bindActionCreators({
+    onChangeEmail,
+    onChangePassword,
+    // onChangeUsername,
+    onSubmit,
+    onUnload,
+  }, dispatch);
+};
 
 class Register extends React.Component {
   constructor() {
     super();
     this.changeEmail = ev => this.props.onChangeEmail(ev.target.value);
     this.changePassword = ev => this.props.onChangePassword(ev.target.value);
-    this.changeUsername = ev => this.props.onChangeUsername(ev.target.value);
-    this.submitForm = (username, email, password) => ev => {
+    // this.changeUsername = ev => this.props.onChangeUsername(ev.target.value);
+    this.submitForm = (email, password) => ev => {
       ev.preventDefault();
-      this.props.onSubmit(username, email, password);
+      this.props.onSubmit(email, password);
     }
   }
 
@@ -60,19 +71,19 @@ class Register extends React.Component {
                 </Link>
               </p>
 
-              <ListErrors errors={this.props.errors} />
+              <ListErrors error={this.props.error} />
 
-              <form onSubmit={this.submitForm(username, email, password)}>
+              <form onSubmit={this.submitForm(email, password)}>
                 <fieldset>
 
-                  <fieldset className="form-group">
+                  {/* <fieldset className="form-group">
                     <input
                       className="form-control form-control-lg"
                       type="text"
                       placeholder="Username"
                       value={this.props.username}
                       onChange={this.changeUsername} />
-                  </fieldset>
+                  </fieldset> */}
 
                   <fieldset className="form-group">
                     <input

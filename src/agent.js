@@ -1,5 +1,18 @@
 import superagentPromise from 'superagent-promise';
 import _superagent from 'superagent';
+import firebase from 'firebase';
+
+
+const app = firebase.initializeApp({
+  apiKey: "AIzaSyDl6cXZO7Jm-s0qahQqpEo8ax2rv3jlKlk",
+  authDomain: "sprung-5c945.firebaseapp.com",
+  databaseURL: "https://sprung-5c945.firebaseio.com",
+  projectId: "sprung-5c945",
+  storageBucket: "sprung-5c945.appspot.com",
+  messagingSenderId: "263688550982"
+});
+
+
 
 const superagent = superagentPromise(_superagent, global.Promise);
 
@@ -26,16 +39,46 @@ const requests = {
     superagent.post(`${API_ROOT}${url}`, body).use(tokenPlugin).then(responseBody)
 };
 
+// const Auth = {
+//   current: () =>
+//     requests.get('/user'),
+//   login: (email, password) =>
+//     requests.post('/users/login', { user: { email, password } }),
+//   register: (username, email, password) =>
+//     requests.post('/users', { user: { username, email, password } }),
+//   save: user =>
+//     requests.put('/user', { user })
+// };
+
 const Auth = {
-  current: () =>
-    requests.get('/user'),
-  login: (email, password) =>
-    requests.post('/users/login', { user: { email, password } }),
-  register: (username, email, password) =>
-    requests.post('/users', { user: { username, email, password } }),
-  save: user =>
-    requests.put('/user', { user })
-};
+  current: () => {
+    const user = firebase.auth().currentUser;
+    if (user){
+      return user;
+    }
+    return null;
+  },
+  login: (email, password) => {
+    return new Promise((resolve, reject) => {
+      firebase.auth().signInWithEmailAndPassword(email, password).then(user => {
+        resolve(user);
+      }).catch(function(error) {
+        console.log(error.message);
+        reject(error);
+      });
+    });
+  },
+  register: (email, password) => {
+    return new Promise((resolve, reject) => {
+      firebase.auth().createUserWithEmailAndPassword(email, password).then(user => {
+        resolve(user);
+      }).catch(function(error) {
+        console.log(error.message);
+        reject(error);
+      });
+    })
+  }
+}
 
 const Tags = {
   getAll: () => {

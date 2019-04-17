@@ -85,18 +85,58 @@ const Auth = {
 
 const Tags = {
   getAll: () => {
-    return JSON.parse('{"tags":["dragons","test","training","tags","as","coffee","money","flowers","sushi","caramel","cars","sugar","happiness","japan","cookies","well","clean","animation","baby"]}')
+    return new Promise((resolve, reject) => {
+      db.collection('posts').get().then((doc) => {
+        const list = [], tagList = [];
+        doc.forEach(d => {
+          list.push(d.data());
+        })
+        list.forEach(item => {
+          if(item.tagList && item.tagList.length){
+            item.tagList.forEach(tag => {
+              tagList.push(tag);
+            })
+          }
+        })
+        resolve(tagList);
+      }).catch(function(error) {
+        reject(error);
+      });
+    })
   }
 };
 
 const limit = (count, p) => `limit=${count}&offset=${p ? p * count : 0}`;
 const omitSlug = article => Object.assign({}, article, { slug: undefined })
 const Articles = {
-  all: page => {
-    return JSON.parse('{"articles":[{"title":"h","slug":"h-87sas1","body":"hnsedt","createdAt":"2019-04-13T09:03:58.209Z","updatedAt":"2019-04-13T09:03:58.209Z","tagList":["jnt"],"description":"hsdrtg","author":{"username":"cheng","bio":"This is my bio","image":"https://static.productionready.io/images/smiley-cyrus.jpg","following":false},"favorited":false,"favoritesCount":2},{"title":"zsvgvase","slug":"zsvgvase-kah320","body":"bhaserfbh","createdAt":"2019-04-13T09:02:15.469Z","updatedAt":"2019-04-13T09:02:15.469Z","tagList":["abher","bhaesrbh","ebh"],"description":"gbaser","author":{"username":"cheng","bio":"This is my bio","image":"https://static.productionready.io/images/smiley-cyrus.jpg","following":false},"favorited":false,"favoritesCount":1},{"title":"Who is from Europe?","slug":"who-is-from-europe-1sbif","body":"Hello world!","createdAt":"2019-04-13T08:20:54.350Z","updatedAt":"2019-04-13T08:20:54.350Z","tagList":[],"description":"europe","author":{"username":"vanapagan","bio":null,"image":"https://static.productionready.io/images/smiley-cyrus.jpg","following":false},"favorited":false,"favoritesCount":1},{"title":"Hy bud, wassup","slug":"hy-bud-wassup-e535wi","body":"go do better stuff","createdAt":"2019-04-13T07:53:33.053Z","updatedAt":"2019-04-13T07:53:33.053Z","tagList":["testing"],"description":"nothing","author":{"username":"kiranashok","bio":null,"image":"https://static.productionready.io/images/smiley-cyrus.jpg","following":false},"favorited":false,"favoritesCount":2},{"title":"This is a Test","slug":"this-is-a-test-fh4fxc","body":"Sed ligula enim, cursus sed dui rhoncus, gravida porta tortor. Fusce et lacinia quam. Aenean in nibh vitae tortor vulputate ultrices. Nunc fringilla sem a iaculis gravida. Aenean maximus suscipit urna vel bibendum. Morbi tincidunt condimentum velit sit amet fermentum. Donec sagittis elementum magna a suscipit. Suspendisse potenti.","createdAt":"2019-04-13T06:49:57.527Z","updatedAt":"2019-04-13T06:49:57.527Z","tagList":[],"description":"just messing around","author":{"username":"jwerre","bio":null,"image":"https://static.productionready.io/images/smiley-cyrus.jpg","following":false},"favorited":false,"favoritesCount":1},{"title":"grtbvz","slug":"grtbvz-lvnk0w","body":"bhsh","createdAt":"2019-04-13T06:16:46.980Z","updatedAt":"2019-04-13T06:16:46.980Z","tagList":["dragon"],"description":"gbvz","author":{"username":"cheng","bio":"This is my bio","image":"https://static.productionready.io/images/smiley-cyrus.jpg","following":false},"favorited":false,"favoritesCount":1},{"title":"sdgv","slug":"sdgv-efj93q","body":"fgbzsrfbh","createdAt":"2019-04-13T06:16:18.682Z","updatedAt":"2019-04-13T06:16:18.682Z","tagList":["bhaz","bhzser"],"description":"gvzsr","author":{"username":"cheng","bio":"This is my bio","image":"https://static.productionready.io/images/smiley-cyrus.jpg","following":false},"favorited":false,"favoritesCount":1},{"title":"Test post","slug":"test-post-rnr2xk","body":"Test post for Angular SSR","createdAt":"2019-04-13T05:42:42.007Z","updatedAt":"2019-04-13T05:42:42.007Z","tagList":[],"description":"With Angular SSR","author":{"username":"sanketmaru","bio":null,"image":"https://static.productionready.io/images/smiley-cyrus.jpg","following":false},"favorited":false,"favoritesCount":0},{"title":"top places in chicago","slug":"top-places-in-chicago-73uolw","body":"- zoo- museum- park","createdAt":"2019-04-13T02:48:08.214Z","updatedAt":"2019-04-13T02:48:08.214Z","tagList":["#zoo","#chicago"],"description":"this is a list for newcomers to visit","author":{"username":"tggtrg","bio":"svsdvdfsdsvdsvdsvds","image":"","following":false},"favorited":false,"favoritesCount":1},{"title":"Asdjldk","slug":"asdjldk-dhh4q","body":"dfghdfgh","createdAt":"2019-04-13T02:28:41.172Z","updatedAt":"2019-04-13T02:28:41.172Z","tagList":[],"description":"cklvjlsdkf","author":{"username":"Rodrigo","bio":null,"image":"https://static.productionready.io/images/smiley-cyrus.jpg","following":false},"favorited":false,"favoritesCount":1}],"articlesCount":500}')
+  all: (page) => {
+    return new Promise((resolve, reject) => {
+      db.collection('posts').get().then((doc) => {
+        let list = [];
+        doc.forEach(d => {
+          list.push(d.data());
+        })
+        resolve(list);
+      }).catch(function(error) {
+        reject(error);
+      });
+    })
   },
-  byAuthor: (author, page) =>
-    requests.get(`/articles?author=${encode(author)}&${limit(5, page)}`),
+  byAuthor: (author, page) => {
+    return new Promise((resolve, reject) => {
+      db.collection('posts').get().then((doc) => {
+        let list = [];
+        doc.forEach(d => {
+          if(d.data().author && d.data().author === "/users/" + author){
+            list.push(d.data());
+          }
+        })
+        resolve(list);
+      }).catch(function(error) {
+        reject(error);
+      });
+    })
+  },
   byTag: (tag, page) =>
     requests.get(`/articles?tag=${encode(tag)}&${limit(10, page)}`),
   del: slug =>
@@ -105,8 +145,21 @@ const Articles = {
     requests.post(`/articles/${slug}/favorite`),
   favoritedBy: (author, page) =>
     requests.get(`/articles?favorited=${encode(author)}&${limit(5, page)}`),
-  feed: () =>
-    requests.get('/articles/feed?limit=10&offset=0'),
+  feed: () => {
+    return new Promise((resolve, reject) => {
+      db.collection('posts').get().then((doc) => {
+        let list = [];
+        doc.forEach(d => {
+          const currentUser = JSON.parse(window.localStorage.getItem('authUser'));
+          if(d.data().author && d.data().author === "/users/" + currentUser.uid)
+          list.push(d.data());
+        })
+        resolve(list);
+      }).catch(function(error) {
+        reject(error);
+      });
+    })
+  },
   get: slug => {
     return new Promise((resolve, reject) => {
       db.collection('posts').doc(slug).get().then((doc) => {
@@ -126,7 +179,7 @@ const Articles = {
   create: article => {
     return new Promise((resolve, reject) => {
       const currentUser = JSON.parse(window.localStorage.getItem('authUser'));
-      const slug = article.title.replace(' ', '-');
+      const slug = article.title.split(' ').join('-');
       const data = {
         author: '/users/' + JSON.parse(window.localStorage.getItem('authUser')).uid,
         title: article.title,
@@ -153,15 +206,22 @@ const Comments = {
     requests.post(`/articles/${slug}/comments`, { comment }),
   delete: (slug, commentId) =>
     requests.del(`/articles/${slug}/comments/${commentId}`),
-  forArticle: slug =>
-    requests.get(`/articles/${slug}/comments`)
+  forArticle: slug => ([]),
 };
 
 const Profile = {
   follow: username =>
     requests.post(`/profiles/${username}/follow`),
-  get: username =>
-    requests.get(`/profiles/${username}`),
+  get: username => {
+    return new Promise((resolve, reject) => {
+      db.collection('users').doc(username).get().then((doc) => {
+        doc.exists ? resolve(doc.data()) : reject();
+      })
+      .catch(function(error) {
+        reject(error);
+      });
+    })
+  },
   unfollow: username =>
     requests.del(`/profiles/${username}/follow`)
 };

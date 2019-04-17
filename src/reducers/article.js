@@ -11,7 +11,7 @@ export default (state = {}, action) => {
       return {
         ...state,
         article: action.payload[0],
-        comments: action.payload[1]
+        comments: action.payload[1],
       };
     case ARTICLE_PAGE_UNLOADED:
       return {};

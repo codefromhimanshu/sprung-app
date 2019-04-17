@@ -4,6 +4,7 @@ import React from 'react';
 import Tags from './Tags';
 import agent from '../../agent';
 import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {
   HOME_PAGE_LOADED,
   HOME_PAGE_UNLOADED,
@@ -15,29 +16,37 @@ const Promise = global.Promise;
 const mapStateToProps = state => ({
   ...state.home,
   appName: state.common.appName,
-  token: state.common.token
+  currentUser: state.common.currentUser,
 });
 
-const mapDispatchToProps = dispatch => ({
-  onClickTag: (tag, pager, payload) =>
-    dispatch({ type: APPLY_TAG_FILTER, tag, pager, payload }),
-  onLoad: (tab, pager, payload) => {
-    console.log(pager);
-    console.log(payload);
-    dispatch({ type: HOME_PAGE_LOADED, tab, pager, payload })
-  },
-  onUnload: () =>
-    dispatch({  type: HOME_PAGE_UNLOADED })
-});
+
+const onClickTag = (tag, pager, payload) => ({ type: APPLY_TAG_FILTER, tag, pager, payload });
+const onLoad = (tab, pager) => dispatch => {
+  // const promise1 = new Promise(agent.Tags.getAll());
+  // const promise1 = new Promise(pager);
+  return Promise.all([agent.Tags.getAll(), pager()]).then((payload) => {
+    dispatch({ type: HOME_PAGE_LOADED, tab, pager,  payload});
+  });
+};
+const onUnload = () => ({ type: HOME_PAGE_UNLOADED });
+
+
+const mapDispatchToProps = dispatch => {
+  return bindActionCreators({
+    onClickTag,
+    onLoad,
+    onUnload,
+  }, dispatch);
+};
 
 class Home extends React.Component {
   componentWillMount() {
-    const tab = this.props.token ? 'feed' : 'all';
-    const articlesPromise = this.props.token ?
+    const tab = this.props.currentUser ? 'feed' : 'all';
+    const articlesPromise = this.props.currentUser ?
       agent.Articles.feed :
       agent.Articles.all;
 
-    this.props.onLoad(tab, articlesPromise, [agent.Tags.getAll(), articlesPromise()]);
+    this.props.onLoad(tab, articlesPromise);
   }
 
   componentWillUnmount() {

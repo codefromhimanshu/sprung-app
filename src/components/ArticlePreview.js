@@ -33,20 +33,23 @@ const ArticlePreview = props => {
     }
   };
 
+  const articleAuthorUid = article.author.split('/');
+  const authorProfileSlug = articleAuthorUid[articleAuthorUid.length -1];
+
   return (
     <div className="article-preview">
       <div className="article-meta">
-        <Link to={`/@${article.author.username}`}>
-          <img src={article.author.image} alt={article.author.username} />
+        <Link to={`/@${authorProfileSlug}`}>
+          <img src={article.author.image} />
         </Link>
 
         <div className="info">
-          <Link className="author" to={`/@${article.author.username}`}>
-            {article.author.username}
+          <Link className="author" to={`/@${authorProfileSlug}`}>
+            {authorProfileSlug}
           </Link>
-          <span className="date">
+          {/* <span className="date">
             {new Date(article.createdAt).toDateString()}
-          </span>
+          </span> */}
         </div>
 
         <div className="pull-xs-right">

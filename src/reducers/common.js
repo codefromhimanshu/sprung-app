@@ -16,6 +16,7 @@ import {
   LOGIN_PAGE_UNLOADED,
   REGISTER_PAGE_UNLOADED
 } from '../constants/actionTypes';
+import isEmpty from 'lodash.isempty';
 
 
 const defaultState = {
@@ -27,7 +28,10 @@ const defaultState = {
 export default (state = defaultState, action) => {
   switch (action.type) {
     case APP_LOAD:
-      const authUser = JSON.parse(window.localStorage.getItem('authUser'));
+      let authUser;
+      if(!isEmpty(window.localStorage.getItem('authUser'))){
+        authUser = JSON.parse(window.localStorage.getItem('authUser'));
+      }
       return {
         ...state,
         // token: action.token || null,

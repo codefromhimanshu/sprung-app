@@ -14,15 +14,16 @@ import Register from '../components/Register';
 import Settings from '../components/Settings';
 import { store } from '../store';
 import { push } from 'react-router-redux';
+import isEmpty from 'lodash.isempty';
+
 
 const mapStateToProps = state => {
-  const authUser = JSON.parse(window.localStorage.getItem('authUser'));
-  let currentUser;
-  if(authUser){
-    currentUser = authUser;
+  let authUser;
+  if(!isEmpty(window.localStorage.getItem('authUser'))){
+    authUser = JSON.parse(window.localStorage.getItem('authUser'));
   }
   return {
-    currentUser,
+    currentUser: authUser,
     appLoaded: state.common.appLoaded,
     appName: state.common.appName,
     redirectTo: state.common.redirectTo,

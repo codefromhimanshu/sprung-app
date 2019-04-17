@@ -87,12 +87,15 @@ class Profile extends React.Component {
   }
 
   renderTabs() {
+    // const articleAuthorUid = article.author.split('/');
+    // const authorProfileSlug = articleAuthorUid[articleAuthorUid.length -1];
+
     return (
       <ul className="nav nav-pills outline-active">
         <li className="nav-item">
           <Link
             className="nav-link active"
-            to={`/@${this.props.profile.username}`}>
+            to={`/@${this.props.match.params.username}`}>
             My Articles
           </Link>
         </li>
@@ -100,7 +103,7 @@ class Profile extends React.Component {
         <li className="nav-item">
           <Link
             className="nav-link"
-            to={`/@${this.props.profile.username}/favorites`}>
+            to={`/@${this.props.match.params.username}/favorites`}>
             Favorited Articles
           </Link>
         </li>
@@ -115,7 +118,7 @@ class Profile extends React.Component {
     }
 
     const isUser = this.props.currentUser &&
-      this.props.profile.username === this.props.currentUser.username;
+      this.props.match.params.username === this.props.currentUser.uid;
 
     return (
       <div className="profile-page">
@@ -127,8 +130,6 @@ class Profile extends React.Component {
 
                 <img src={profile.image} className="user-img" alt={profile.username} />
                 <h4>{profile.username}</h4>
-                <p>{profile.bio}</p>
-
                 <EditProfileSettings isUser={isUser} />
                 <FollowUserButton
                   isUser={isUser}
@@ -148,7 +149,7 @@ class Profile extends React.Component {
             <div className="col-xs-12 col-md-10 offset-md-1">
 
               <div className="articles-toggle">
-                {this.renderTabs()}
+                {/* {this.renderTabs()} */}
               </div>
 
               <ArticleList

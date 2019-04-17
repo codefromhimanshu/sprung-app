@@ -10,15 +10,15 @@ export default (state = {}, action) => {
     case ARTICLE_PAGE_LOADED:
       return {
         ...state,
-        article: action.payload[0].article,
-        comments: action.payload[1].comments
+        article: action.payload[0],
+        comments: action.payload[1]
       };
     case ARTICLE_PAGE_UNLOADED:
       return {};
     case ADD_COMMENT:
       return {
         ...state,
-        commentErrors: action.error ? action.payload.errors : null,
+        commentErrors: action.error ? action.payload.error : null,
         comments: action.error ?
           null :
           (state.comments || []).concat([action.payload.comment])

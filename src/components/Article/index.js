@@ -37,7 +37,8 @@ class Article extends React.Component {
 
     const markup = { __html: marked(this.props.article.body, { sanitize: true }) };
     const canModify = this.props.currentUser &&
-      this.props.currentUser.username === this.props.article.author.username;
+      ( ( '/users/' + this.props.currentUser.uid ) === this.props.article.author );
+
     return (
       <div className="article-page">
 
@@ -48,7 +49,6 @@ class Article extends React.Component {
             <ArticleMeta
               article={this.props.article}
               canModify={canModify} />
-
           </div>
         </div>
 

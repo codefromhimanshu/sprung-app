@@ -26,7 +26,8 @@ const mapStateToProps = state => {
     appLoaded: state.common.appLoaded,
     appName: state.common.appName,
     redirectTo: state.common.redirectTo,
-  }};
+  };
+};
 
 const mapDispatchToProps = dispatch => ({
   onLoad: (payload, token) =>

@@ -13,12 +13,12 @@ export default (state = {}, action) => {
     case EDITOR_PAGE_LOADED:
       return {
         ...state,
-        articleSlug: action.payload ? action.payload.article.slug : '',
-        title: action.payload ? action.payload.article.title : '',
-        description: action.payload ? action.payload.article.description : '',
-        body: action.payload ? action.payload.article.body : '',
+        articleSlug: action.payload ? action.payload.slug : '',
+        title: action.payload ? action.payload.title : '',
+        description: action.payload ? action.payload.description : '',
+        body: action.payload ? action.payload.body : '',
         tagInput: '',
-        tagList: action.payload ? action.payload.article.tagList : []
+        tagList: action.payload ? action.payload.tagList : []
       };
     case EDITOR_PAGE_UNLOADED:
       return {};
@@ -26,7 +26,7 @@ export default (state = {}, action) => {
       return {
         ...state,
         inProgress: null,
-        errors: action.error ? action.payload.errors : null
+        error: action.error ? action.payload.error : null
       };
     case ASYNC_START:
       if (action.subtype === ARTICLE_SUBMITTED) {

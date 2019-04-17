@@ -13,6 +13,9 @@ const app = firebase.initializeApp({
 });
 
 
+const db = firebase.firestore();
+
+
 
 const superagent = superagentPromise(_superagent, global.Promise);
 
@@ -104,14 +107,45 @@ const Articles = {
     requests.get(`/articles?favorited=${encode(author)}&${limit(5, page)}`),
   feed: () =>
     requests.get('/articles/feed?limit=10&offset=0'),
-  get: slug =>
-    requests.get(`/articles/${slug}`),
+  get: slug => {
+    return new Promise((resolve, reject) => {
+      db.collection('posts').doc(slug).get().then((doc) => {
+        doc.exists ? resolve(doc.data()) : reject();
+      })
+      .catch(function(error) {
+        reject(error);
+      });
+    })
+  },
   unfavorite: slug =>
     requests.del(`/articles/${slug}/favorite`),
   update: article =>
     requests.put(`/articles/${article.slug}`, { article: omitSlug(article) }),
-  create: article =>
-    requests.post('/articles', { article })
+  // create: article =>
+  //   requests.post('/articles', { article })
+  create: article => {
+    return new Promise((resolve, reject) => {
+      const currentUser = JSON.parse(window.localStorage.getItem('authUser'));
+      const slug = article.title.replace(' ', '-');
+      const data = {
+        author: '/users/' + JSON.parse(window.localStorage.getItem('authUser')).uid,
+        title: article.title,
+        description: article.description,
+        body: article.body,
+        tagList: article.tagList,
+        slug: article.title.replace(' ', '-'),
+      }
+
+      db.collection('posts').doc(slug).set(data).then(() => {
+        console.log("Document successfully written!");
+        resolve(data);
+      })
+      .catch(function(error) {
+        console.error("Error adding document: ", error);
+        reject(error);
+      });
+    });
+  }
 };
 
 const Comments = {

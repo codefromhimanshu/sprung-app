@@ -17,6 +17,7 @@ import {
   REGISTER_PAGE_UNLOADED
 } from '../constants/actionTypes';
 
+
 const defaultState = {
   appName: 'Sprung',
   token: null,
@@ -26,11 +27,12 @@ const defaultState = {
 export default (state = defaultState, action) => {
   switch (action.type) {
     case APP_LOAD:
+      const authUser = JSON.parse(window.localStorage.getItem('authUser'));
       return {
         ...state,
-        token: action.token || null,
+        // token: action.token || null,
         appLoaded: true,
-        currentUser: action.payload ? action.payload.user : null
+        currentUser: authUser ? authUser : null
       };
     case REDIRECT:
       return { ...state, redirectTo: null };

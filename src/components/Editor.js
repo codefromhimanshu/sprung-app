@@ -2,6 +2,7 @@ import ListErrors from './ListErrors';
 import React from 'react';
 import agent from '../agent';
 import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
 import {
   ADD_TAG,
   EDITOR_PAGE_LOADED,
@@ -15,20 +16,31 @@ const mapStateToProps = state => ({
   ...state.editor
 });
 
-const mapDispatchToProps = dispatch => ({
-  onAddTag: () =>
-    dispatch({ type: ADD_TAG }),
-  onLoad: payload =>
-    dispatch({ type: EDITOR_PAGE_LOADED, payload }),
-  onRemoveTag: tag =>
-    dispatch({ type: REMOVE_TAG, tag }),
-  onSubmit: payload =>
-    dispatch({ type: ARTICLE_SUBMITTED, payload }),
-  onUnload: payload =>
-    dispatch({ type: EDITOR_PAGE_UNLOADED }),
-  onUpdateField: (key, value) =>
-    dispatch({ type: UPDATE_FIELD_EDITOR, key, value })
-});
+const onSubmit = payload => dispatch => {
+  return agent.Articles.create(payload).then(article => {
+    dispatch({ type: ARTICLE_SUBMITTED, payload: {article} });
+  }).catch(err => {
+    console.log(err);
+  });
+}
+
+const onAddTag = () => ({ type: ADD_TAG });
+const onLoad = payload => ({ type: EDITOR_PAGE_LOADED, payload });
+const onRemoveTag = tag => ({ type: REMOVE_TAG, tag });
+const onUnload  = () => ({ type: EDITOR_PAGE_UNLOADED });
+const onUpdateField = (key, value) => ({ type: UPDATE_FIELD_EDITOR, key, value });
+
+
+const mapDispatchToProps = dispatch => {
+  return bindActionCreators({
+    onAddTag,
+    onLoad,
+    onRemoveTag,
+    onSubmit,
+    onUnload,
+    onUpdateField,
+  }, dispatch);
+};
 
 class Editor extends React.Component {
   constructor() {
@@ -61,12 +73,7 @@ class Editor extends React.Component {
         tagList: this.props.tagList
       };
 
-      const slug = { slug: this.props.articleSlug };
-      const promise = this.props.articleSlug ?
-        agent.Articles.update(Object.assign(article, slug)) :
-        agent.Articles.create(article);
-
-      this.props.onSubmit(promise);
+      this.props.onSubmit(article);
     };
   }
 
@@ -74,7 +81,7 @@ class Editor extends React.Component {
     if (this.props.match.params.slug !== nextProps.match.params.slug) {
       if (nextProps.match.params.slug) {
         this.props.onUnload();
-        return this.props.onLoad(agent.Articles.get(this.props.match.params.slug));
+        return this.props.onLoad(agent.Articles.get(nextProps.match.params.slug));
       }
       this.props.onLoad(null);
     }
@@ -98,7 +105,7 @@ class Editor extends React.Component {
           <div className="row">
             <div className="col-md-10 offset-md-1 col-xs-12">
 
-              <ListErrors errors={this.props.errors}></ListErrors>
+              <ListErrors error={this.props.error}></ListErrors>
 
               <form>
                 <fieldset>

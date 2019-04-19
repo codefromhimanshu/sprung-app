@@ -136,7 +136,7 @@ class Profile extends React.Component {
                   user={profile}
                   follow={this.props.onFollow}
                   unfollow={this.props.onUnfollow}
-                  />
+                />
 
               </div>
             </div>

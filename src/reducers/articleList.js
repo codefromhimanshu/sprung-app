@@ -62,8 +62,8 @@ export default (state = {}, action) => {
       return {
         ...state,
         pager: action.pager,
-        articles: action.payload.articles,
-        articlesCount: action.payload.articlesCount,
+        articles: action.payload,
+        articlesCount: action.payload.length,
         tab: action.tab,
         currentPage: 0,
         tag: null

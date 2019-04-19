@@ -74,7 +74,23 @@ const Auth = {
   register: (email, password) => {
     return new Promise((resolve, reject) => {
       firebase.auth().createUserWithEmailAndPassword(email, password).then(user => {
-        resolve(user);
+
+        const username = email.split('@')[0];
+
+        const data = {
+          username,
+          email,
+        };
+
+        db.collection('users').doc(user.user.uid).set(data).then(() => {
+          console.log("User successfully generated!!");
+          resolve(user);
+        }).catch(function(error) {
+          console.error("Error adding User: ", error);
+          reject(error);
+        });
+
+        // resolve(user);
       }).catch(function(error) {
         console.log(error.message);
         reject(error);
@@ -186,8 +202,8 @@ const Articles = {
         description: article.description,
         body: article.body,
         tagList: article.tagList,
-        slug: article.title.replace(' ', '-'),
-      }
+        slug: article.title.split(' ').join('-'),
+      };
 
       db.collection('posts').doc(slug).set(data).then(() => {
         console.log("Document successfully written!");
